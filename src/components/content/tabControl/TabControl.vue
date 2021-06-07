@@ -2,6 +2,7 @@
   <div class="tab-control">
     <div
       v-for="(item, index) in titles"
+      :key="index"
       class="tab-control-item"
       :class="{ active: index === currentIndex }"
       @click="itemClick(index)"
@@ -19,20 +20,21 @@ export default {
       type: Array,
       default() {
         return [];
-      },
-    },
+      }
+    }
   },
   data() {
     return {
-      currentIndex: 0,
+      currentIndex: 0
     };
   },
   methods: {
     itemClick(index) {
       this.currentIndex = index;
+      // 父子组件通信, 子组件发生点击,使用自定义事件,emit传到外面去
       this.$emit("tabClick", index);
-    },
-  },
+    }
+  }
 };
 </script>
 
