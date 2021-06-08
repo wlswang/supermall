@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <!-- home 离开时记录状态 -->
     <keep-alive exclude="Detail">
       <router-view></router-view>
     </keep-alive>

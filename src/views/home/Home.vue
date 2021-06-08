@@ -1,12 +1,13 @@
 <template>
   <div id="home">
     <nav-bar class="home-nav"><div slot="center">购物街</div></nav-bar>
-    <!-- <tab-control
+    <tab-control
       :titles="['流行', '新款', '精选']"
       class="tab-control"
       ref="tabControl1"
       @tabClick="tabClick"
-    /> -->
+      v-show="isTabFixed"
+    />
     <scroll
       class="content"
       :probe-type="3"
@@ -47,6 +48,8 @@ import FeatureView from "./childComps/FeatureView";
 
 import { getHomeMultidata, getHomeGoods } from "network/home";
 
+import {debounce} from "common/utils";
+
 export default {
   name: "Home",
   components: {
@@ -73,12 +76,24 @@ export default {
       },
       // 是否显示 置顶按钮
       isShowBackTop: false,
+      // 标签是否显示
+      isTabFixed: false,
     };
   },
   computed: {
     showGoods() {
       return this.goods[this.currentType].list;
     },
+  },
+  destroyed() {
+    console.log('home destroyed')
+  },
+  activated() {
+    this.$refs.scroll.scrollTo(0, this.savey, 0)
+    this.$refs.scroll.refresh()
+  },
+  deactivated() {
+    this.savey = this.$refs.scroll.getScrollY()
   },
   created() {
     // 1. 请求多个数据
@@ -89,7 +104,7 @@ export default {
   },
   mounted() {
     // 图片加载完成的事件监听
-    const refresh = this.debounce(this.$refs.scroll.refresh, 50)
+    const refresh = debounce(this.$refs.scroll.refresh, 50)
     this.$bus.$on('itemImageLoad', () => {
       refresh()
     })
@@ -98,15 +113,6 @@ export default {
     /**
      * 事件监听相关的方法
      */
-    debounce(func, delay) {
-      let timer = null
-      return function(...args) {
-        if (timer) clearTimeout(timer)
-        timer = setTimeout(() => {
-          func.apply(this, args)
-        }, delay)
-      }
-    },
     tabClick(index) {
       console.log(index);
       switch (index) {
@@ -120,6 +126,8 @@ export default {
           this.currentType = "sell";
           break;
       }
+      this.$refs.tabControl1.currentIndex = index;
+      this.$refs.tabControl2.currentIndex = index;
     },
     // 加载更多
     loadMore() {
@@ -129,6 +137,10 @@ export default {
     contentScroll(position) {
       // 1. 判断backtop是否显示
       this.isShowBackTop = (-position.y) > 1000
+
+      // 2. 判断tabControl是否吸顶（position: fixed）
+      this.isTabFixed = (-position.y) > this.tabOffsetTop
+
     },
     // 返回顶部
     backClick() {
@@ -136,7 +148,7 @@ export default {
     },
     //
     swiperImageLoad() {
-      // this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop;
+      this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop;
     },
     /**
      * 网络请求相关的方法
