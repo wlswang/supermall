@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import BScroll, { PullUpLoad } from 'better-scroll'
+import BScroll from 'better-scroll'
 
 export default {
   name: "Scroll",
@@ -63,7 +63,7 @@ export default {
     scrollTo(x, y, time=300) {
       this.scroll && this.scroll.scrollTo(x, y, time)
     },
-    // 刷新函数 重新计算content的高度，图片加载完在计算高度 
+    // 刷新函数 重新计算content的高度，图片加载完在计算高度
     refresh() {
       // this.scroll  先判断 scroll是否有值，有值时在执行后面的刷新操作
       this.scroll && this.scroll.refresh()

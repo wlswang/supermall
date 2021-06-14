@@ -26,8 +26,8 @@ export default {
     },
     // 跳转到详情页
     itemClick() {
-      console.log('跳转到详情页');
-      console.log(this.goodsItem);
+      // console.log('跳转到详情页');
+      // console.log(this.goodsItem);
       this.$router.push('/detail/' + this.goodsItem.iid)
     }
   }
