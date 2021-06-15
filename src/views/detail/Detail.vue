@@ -1,7 +1,7 @@
 <template>
   <div id="detail">
-    <detail-nav-bar></detail-nav-bar>
-    <scroll :probe-type="3" ref="scroll" class="content">
+    <detail-nav-bar class="detail-nav"></detail-nav-bar>
+    <scroll class="content" ref="scroll">
       <detail-swiper :top-images="topImages" />
       <detail-base-info :goods="goods" />
       <detail-shop-info :shop="shop" />
@@ -15,7 +15,6 @@
 import DetailNavBar from "./childComps/DetailNavBar";
 import DetailSwiper from "./childComps/DetailSwiper";
 import DetailBaseInfo from "./childComps/DetailBaseInfo";
-import DetailShopInfo from "./childComps/DetailShopInfo";
 import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
 import DetailParamInfo from "./childComps/DetailParamInfo";
 
@@ -53,24 +52,26 @@ export default {
     getDetail(this.iid).then(res => {
       // 1. 获取轮播图的数据
       const data = res.result;
+
+      // 2. 获取轮播图数据
       this.topImages = data.itemInfo.topImages;
 
       // console.log(data.shopInfo.services);
-      // 2. 获取商品详情数据
+      // 3. 获取商品详情数据
       this.goods = new Goods(
         data.itemInfo,
         data.columns,
         data.shopInfo.services
       );
 
-      // 3. 创建店铺信息对象
+      // 4. 创建店铺信息对象
       this.shop = new Shop(data.shopInfo);
       // console.log(this.shop)
 
-      // 4. 保存商品的详细信息
+      // 5. 保存商品的详细信息
       this.detailInfo = data.detailInfo;
 
-      // 5. 获取参数信息
+      // 6. 获取参数信息
       this.paramInfo = new GoodsParam(
         data.itemParams.info,
         data.itemParams.rule
@@ -86,6 +87,18 @@ export default {
 </script>
 
 <style scoped>
+  #detail {
+    position: relative;
+    z-index: 9;
+    background-color: #fff;
+    height: 100vh;
+  }
+
+  .detail-nav {
+    position: relative;
+    z-index: 9;
+    background-color: #fff;
+  }
 
  .content {
     height: calc(100% - 44px);
