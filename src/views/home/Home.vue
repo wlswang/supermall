@@ -48,7 +48,7 @@ import FeatureView from "./childComps/FeatureView";
 
 import { getHomeMultidata, getHomeGoods } from "network/home";
 
-import {debounce} from "common/utils";
+import {itemListenerMixin} from "common/mixin";
 
 export default {
   name: "Home",
@@ -62,6 +62,7 @@ export default {
     RecommendView,
     FeatureView,
   },
+  mixins: [itemListenerMixin],
   data() {
     return {
       banners: [],
@@ -78,6 +79,7 @@ export default {
       isShowBackTop: false,
       // 标签是否显示
       isTabFixed: false,
+      saveY: 0
     };
   },
   computed: {
@@ -93,7 +95,11 @@ export default {
     this.$refs.scroll.refresh()
   },
   deactivated() {
-    this.savey = this.$refs.scroll.getScrollY()
+    // 1.保存Y值
+    this.saveY = this.$refs.scroll.getScrollY()
+
+    // 2. 取消全局监听的事件
+    this.$bus.$off('itemImageLoad', this.itemImgListener)
   },
   created() {
     // 1. 请求多个数据
@@ -104,13 +110,13 @@ export default {
   },
   mounted() {
     // 图片加载完成的事件监听
-    const refresh = debounce(this.$refs.scroll.refresh, 50)
-    this.$bus.$on('itemImageLoad', () => {
-      refresh()
-    })
+    // const refresh = debouce(this.$refs.scroll.refresh, 50)
+    // this.$bus.$on('itemImageLoad', () => {
+    //   refresh()
+    // })
   },
   methods: {
-    /**
+    /** 
      * 事件监听相关的方法
      */
     tabClick(index) {

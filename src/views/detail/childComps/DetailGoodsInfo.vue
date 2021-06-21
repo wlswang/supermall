@@ -30,13 +30,13 @@ export default {
     imgLoad() {
       // 判断，所有的图片都已经加载完，那么进行这次回调   ++ 先加在对比
       if (++this.counter === this.imagesLength) {
-        this.$emit('imageLoad')
+        this.$emit('detailImageLoad')
       }
     }
   },
   // 监听属性的改变
   watch: {
-    detailInfo() {
+    detailInfonum() {
       // 获取图片的个数
       this.imagesLength = this.detailInfo.detailImage[0].list.length
     }
