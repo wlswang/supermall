@@ -4,7 +4,7 @@
       <div slot="left" class="back" @click="backClick">
         <img src="~assets/img/common/back.svg" alt="">
       </div>
-      <div slot="center" class="title">
+      <div slot="center" class="titles">
         <div
           v-for="(item, index) in titles"
           :key="index"
@@ -42,7 +42,7 @@ export default {
 </script>
 
 <style scoped>
-  .title {
+  .titles {
     display: flex;
     font-size: 13px;
   }

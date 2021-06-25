@@ -5,10 +5,10 @@
       <span class="n-price">{{ goods.newPrice }}</span>
       <span class="o-price">{{ goods.oldPrice }}</span>
       <span
-        v-if="goods.discountDesc"
-        class="discountDesc"
+        v-if="goods.discount"
+        class="discount"
         :style="{ 'background-color': goods.discountBgColor }"
-        >{{ goods.discountDesc }}</span
+        >{{ goods.discount }}</span
       >
     </div>
     <div class="info-other">
@@ -56,7 +56,7 @@ export default {
   }
 
   .info-price .n-price {
-    font-size: 24px;
+    font-size: 22px;
     color: var(--color-high-text)
   }
 
@@ -66,10 +66,11 @@ export default {
     text-decoration: line-through;
   }
 
-  .info-price .discountDesc {
+  .info-price .discount {
     font-size: 12px;
     padding: 2px 5px;
     color: #fff;
+    background-color: var(--color-high-text);
     border-radius: 8px;
     margin-left: 5px;
     position: relative;
@@ -81,6 +82,8 @@ export default {
     line-height: 30px;
     display: flex;
     font-size: 13px;
+    border-bottom: 1px solid rgba(100, 100, 100, 0.1);
+  /* 让span标签均分*/
     justify-content: space-between;
   }
 

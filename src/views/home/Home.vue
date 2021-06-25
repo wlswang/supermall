@@ -28,7 +28,7 @@
         ref="tabControl2"
         @tabClick="tabClick"
       />
-      <good-list :goods="showGoods" />
+      <goods-list :goods="showGoods" />
     </scroll>
     <back-top @click.native="backClick" v-show="isShowBackTop" />
   </div>
@@ -39,16 +39,16 @@ import NavBar from "components/common/navbar/NavBar";
 import Scroll from "components/common/scroll/Scroll";
 
 import TabControl from "components/content/tabControl/TabControl";
-import GoodList from "components/content/goods/GoodsList";
+import GoodsList from "components/content/goods/GoodsList";
 import BackTop from "components/content/backTop/BackTop";
 
 import HomeSwiper from "./childComps/HomeSwiper";
 import RecommendView from "./childComps/RecommendView";
 import FeatureView from "./childComps/FeatureView";
 
+// 网络请求
 import { getHomeMultidata, getHomeGoods } from "network/home";
-
-import {debounce} from "common/utils";
+import { itemListenerMixin } from "common/mixin";
 
 export default {
   name: "Home",
@@ -56,12 +56,13 @@ export default {
     NavBar,
     Scroll,
     TabControl,
-    GoodList,
+    GoodsList,
     BackTop,
     HomeSwiper,
     RecommendView,
     FeatureView,
   },
+  mixins: [itemListenerMixin],
   data() {
     return {
       banners: [],
@@ -85,15 +86,18 @@ export default {
       return this.goods[this.currentType].list;
     },
   },
-  destroyed() {
-    console.log('home destroyed')
-  },
+  // 进入组件生命周期函数
   activated() {
-    this.$refs.scroll.scrollTo(0, this.savey, 0)
-    this.$refs.scroll.refresh()
+    this.$refs.scroll.scrollTo(0, this.savey, 0);
+    this.$refs.scroll.refresh();
   },
+  // 离开组件生命周期函数
   deactivated() {
-    this.savey = this.$refs.scroll.getScrollY()
+    //1.保存离开组件时的位置
+    this.saveY = this.$refs.scroll.getScrollY();
+
+    //2.取消全局事件的监听
+    this.$bus.$off("itemImageLoad", this.itemImgListener);
   },
   created() {
     // 1. 请求多个数据
@@ -102,13 +106,7 @@ export default {
     this.getHomeGoods("new");
     this.getHomeGoods("sell");
   },
-  mounted() {
-    // 图片加载完成的事件监听
-    const refresh = debounce(this.$refs.scroll.refresh, 50)
-    this.$bus.$on('itemImageLoad', () => {
-      refresh()
-    })
-  },
+  mounted() {},
   methods: {
     /**
      * 事件监听相关的方法
@@ -129,27 +127,28 @@ export default {
       this.$refs.tabControl1.currentIndex = index;
       this.$refs.tabControl2.currentIndex = index;
     },
-    // 加载更多
+    // 上拉加载更多
     loadMore() {
       this.getHomeGoods(this.currentType);
     },
-    //
+    // 返回顶部事件监听
+    // 返回顶部的显示与隐藏
     contentScroll(position) {
       // 1. 判断backtop是否显示
-      this.isShowBackTop = (-position.y) > 1000
+      this.isShowBackTop = -position.y > 1000;
 
       // 2. 判断tabControl是否吸顶（position: fixed）
-      this.isTabFixed = (-position.y) > this.tabOffsetTop
-
+      this.isTabFixed = -position.y > this.tabOffsetTop;
     },
     // 返回顶部
     backClick() {
-      this.$refs.scroll.scrollTo(0, 0)
+      this.$refs.scroll.scrollTo(0, 0);
     },
     //
     swiperImageLoad() {
       this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop;
     },
+
     /**
      * 网络请求相关的方法
      */
