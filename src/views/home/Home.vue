@@ -48,7 +48,8 @@ import FeatureView from "./childComps/FeatureView";
 
 // 网络请求
 import { getHomeMultidata, getHomeGoods } from "network/home";
-import { itemListenerMixin } from "common/mixin";
+import { itemListenerMixin, ListenerBackTopMixin} from "common/mixin";
+import { BACK_POSITION } from "common/const";
 
 export default {
   name: "Home",
@@ -57,12 +58,11 @@ export default {
     Scroll,
     TabControl,
     GoodsList,
-    BackTop,
     HomeSwiper,
     RecommendView,
     FeatureView,
   },
-  mixins: [itemListenerMixin],
+  mixins: [itemListenerMixin, ListenerBackTopMixin],
   data() {
     return {
       banners: [],
@@ -135,14 +135,10 @@ export default {
     // 返回顶部的显示与隐藏
     contentScroll(position) {
       // 1. 判断backtop是否显示
-      this.isShowBackTop = -position.y > 1000;
+      this.isShowBackTop = -position.y > BACK_POSITION;
 
       // 2. 判断tabControl是否吸顶（position: fixed）
       this.isTabFixed = -position.y > this.tabOffsetTop;
-    },
-    // 返回顶部
-    backClick() {
-      this.$refs.scroll.scrollTo(0, 0);
     },
     //
     swiperImageLoad() {

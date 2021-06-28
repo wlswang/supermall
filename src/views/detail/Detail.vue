@@ -2,21 +2,28 @@
   <div id="detail">
     <!-- 顶部导航栏 -->
     <detail-nav-bar class="detail-nav" @titleClick="titleClick" ref="nav" />
-    <scroll class="content" ref="scroll" @scroll="contentScroll" :probe-type="3">
+    <scroll
+      class="content"
+      ref="scroll"
+      @scroll="contentScroll"
+      :probe-type="3"
+    >
       <!-- 轮播图 -->
       <detail-swiper :top-images="topImages" />
       <!-- 商品详情 -->
       <detail-base-info :goods="goods" />
       <!-- 店铺信息 -->
       <detail-shop-info :shop="shop" />
-      <detail-goods-info :detail-info="detailInfo" @imageLoad="imageLoad" />
+      <!-- <detail-goods-info :detail-info="detailInfo" @imageLoad="imageLoad" /> -->
       <!-- 参数信息 -->
-      <detail-param-info :param-info="paramInfo" ref="params"/>
+      <detail-param-info :param-info="paramInfo" ref="params" />
       <!-- 评论信息 -->
       <detail-comment-info :commentInfo="commentInfo" ref="comments" />
       <!-- 推荐信息 -->
       <goods-list :goods="recommends" ref="recommend" />
     </scroll>
+    <detail-bottom-bar @addCart="addToCart"/>
+    <back-top @click.native="backClick" v-show="isShowBackTop" />
   </div>
 </template>
 
@@ -28,19 +35,24 @@ import DetailShopInfo from "./childComps/DetailShopInfo";
 import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
 import DetailParamInfo from "./childComps/DetailParamInfo";
 import DetailCommentInfo from "./childComps/DetailCommentInfo";
+import DetailBottomBar from "./childComps/DetailBottomBar";
 
 import Scroll from "components/common/scroll/Scroll";
 import GoodsList from "components/content/goods/GoodsList";
 
+import { itemListenerMixin, ListenerBackTopMixin} from "common/mixin";
+import { BACK_POSITION } from "common/const";
 
-import { itemListenerMixin } from "common/mixin";
+// vuex的映射
+import { mapActions } from 'vuex'
+
 
 import {
   getDetail,
   Goods,
   Shop,
   GoodsParam,
-  getRecommend,
+  getRecommend
 } from "network/detail";
 
 export default {
@@ -53,10 +65,11 @@ export default {
     DetailGoodsInfo,
     DetailParamInfo,
     DetailCommentInfo,
+    DetailBottomBar,
     Scroll,
     GoodsList,
   },
-  mixins: [itemListenerMixin],
+  mixins: [itemListenerMixin, ListenerBackTopMixin],
   data() {
     return {
       iid: null,
@@ -68,7 +81,7 @@ export default {
       commentInfo: {}, // 评论信息
       recommends: [], // 推荐数据
       themeTopYs: [],
-            getThemeTopY: null,
+      getThemeTopY: null,
       currentIndex: 0,
     };
   },
@@ -77,7 +90,7 @@ export default {
     this.iid = this.$route.params.iid;
 
     // 2. 根据ID获取商品数据
-    getDetail(this.iid).then((res) => {
+    getDetail(this.iid).then(res => {
       // 1. 获取轮播图的数据
       const data = res.result;
 
@@ -112,7 +125,7 @@ export default {
     });
 
     // 3. 请求推荐数据
-    getRecommend().then((res) => {
+    getRecommend().then(res => {
       this.recommends = res.data.list;
     });
   },
@@ -120,6 +133,10 @@ export default {
     this.$bus.$off("itemImageLoad", this.itemImgListener);
   },
   methods: {
+
+    // ...mapActions(['addCarts']),
+
+    // 图片加载完毕
     imageLoad() {
       this.refresh();
       this.themeTopYs.push(0);
@@ -148,9 +165,24 @@ export default {
           this.$refs.nav.currentIndex = this.currentIndex;
         }
       }
-        this.isShowBackTop = -position.y > 1000;
+      this.isShowBackTop = -position.y > BACK_POSITION;
     },
-  },
+    // 添加购物车点击事件
+    addToCart() {
+      // 1. 获取购物车需要展示的商品信息
+      const product = {}
+      product.image = this.topImages[0];
+      product.title = this.goods.title;
+      product.desc = this.goods.desc;
+      product.price = this.goods.realPrice;
+      product.iid = this.iid;
+
+      // 2. 将商品添加到购物车 vuex
+      // this.$store.commit('addCart', product)
+      this.$store.dispatch('addCart', product)
+    }
+
+  }
 };
 </script>
 

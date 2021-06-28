@@ -1,13 +1,9 @@
 import Vue from 'vue'
 import App from './App.vue'
-// // 导入路由
-// import router from './router'
-// Vue.config.productionTip = false
-// // 事件总线（非父子组件之间传递东西）
-// Vue.prototype.$bus = new Vue()
-
 //导入路由
 import router from './router'
+import store from './store'
+
 Vue.config.productionTip = false
 //事件总线（非父子组件之间传递东西）
 Vue.prototype.$bus=new Vue()
@@ -23,5 +19,6 @@ Vue.use(VueLazyLoad, {
 
 new Vue({
   render: h => h(App),
-  router
+  router,
+  store
 }).$mount('#app')
